@@ -13,23 +13,90 @@ func PostLobbyEntry(c *gin.Context) {
 	nickname := util.MustGetPostForm(consts.RequestPostFormNickname ,c)
 
 	lobby, lobbyID := models.NewLobby()
-	playerID := lobby.AddPlayer(nickname)
-	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/lobbies/%d?player=%s", lobbyID, playerID))
+	playerID := lobby.AddPlayer(nickname, true)
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/lobbies/%d?player_id=%s", lobbyID, playerID))
 }
 
-func GetLobbyEntry(c *gin.Context) {
+func PatchLobbyEntry(c *gin.Context) {
 	lobbyID := util.MustGetParamInt(consts.RequestParamLobby ,c)
-	playerID := util.MustGetQuery(consts.RequestQueryPlayer ,c)
+	action := util.MustGetPostForm(consts.RequestPostFormAction ,c)
 
 	lobby, ok := models.Lobbies[lobbyID]
 	if !ok {
 		util.ErrorMessageUniversal(c)
+		return
 	}
 
-	_, ok = lobby.Players[playerID]
+	switch action {
+	case consts.LobbyPatchActionAddPlayer:
+		nickname := util.MustGetPostForm(consts.RequestPostFormNickname ,c)
+
+		playerID := lobby.AddPlayer(nickname, false)
+		c.JSON(http.StatusOK, gin.H{"player_id": playerID})
+		return
+	case consts.LobbyPatchActionNextRound:
+		playerID := util.MustGetPostForm(consts.RequestPostFormPlayerID,c)
+
+		player, ok := lobby.Players[playerID]
+		if !ok {
+			util.ErrorMessageUniversal(c)
+			return
+		}
+
+		if !player.IsCreator {
+			util.ErrorMessageUniversal(c)
+			return
+		}
+
+		lobby.StartNewRound()
+		c.String(http.StatusOK, "")
+		return
+	}
+
+	util.ErrorMessageUniversal(c)
+}
+
+func GetLobbyEntry(c *gin.Context) {
+	lobbyID := util.MustGetParamInt(consts.RequestParamLobby ,c)
+	playerID := util.MustGetQuery(consts.RequestQueryPlayerID,c)
+
+	lobby, ok := models.Lobbies[lobbyID]
 	if !ok {
 		util.ErrorMessageUniversal(c)
+		return
 	}
 
-	c.Status(http.StatusOK)
+	player, ok := lobby.Players[playerID]
+	if !ok {
+		util.ErrorMessageUniversal(c)
+		return
+	}
+
+	params := gin.H{}
+	if player.IsActive {
+		params["waiting_class"] = classForShouldHide(true)
+		params["innocent_class"] = classForShouldHide(player.IsMafia)
+		params["mafia_class"] = classForShouldHide(!player.IsMafia)
+		params["innocent_count"] = lobby.PlayerCount() - lobby.CurrentMafiaCount()
+		params["mafia_count"] = lobby.CurrentMafiaCount()
+	} else {
+		params["waiting_class"] = classForShouldHide(false)
+		params["innocent_class"] = classForShouldHide(true)
+		params["mafia_class"] = classForShouldHide(true)
+		params["count_class"] = classForShouldHide(true)
+	}
+	params["round_number"] = lobby.Round
+	params["player_count"] = lobby.PlayerCount()
+	params["creator_class"] = classForShouldHide(!player.IsCreator)
+	params["player_id"] = playerID
+	params["lobby_id"] = lobbyID
+	c.HTML(http.StatusOK, "lobby.tmpl", params)
+}
+
+func classForShouldHide(hidden bool) string {
+	if hidden {
+		return "hide"
+	} else {
+		return ""
+	}
 }

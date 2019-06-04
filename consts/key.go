@@ -8,17 +8,24 @@ const (
 )
 
 const (
-	RequestQueryPlayer       = "player"
+	RequestQueryPlayerID       = "player_id"
 )
 
 const (
-	RequestPostFormNickname  = "nickname"
+	RequestPostFormNickname    = "nickname"
+	RequestPostFormAction      = "action"
+	RequestPostFormPlayerID    = "player_id"
 )
 
 const (
-	RequestParamLobby        = "lobby"
+	LobbyPatchActionAddPlayer  = "add_player"
+	LobbyPatchActionNextRound  = "next_round"
 )
 
 const (
-	ErrorUniversal           = "出错啦"
+	RequestParamLobby          = "lobby"
+)
+
+const (
+	ErrorUniversal             = "出错啦"
 )

@@ -46,7 +46,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a onclick="window.location.href=`lobbies/${document.getElementById('lobby_id').value}?nickname=${document.getElementById('nickname').value}`" class="modal-close waves-effect waves-green btn-flat">加入</a>
+        <a onclick="enterLobby()" class="modal-close waves-effect waves-green btn-flat">加入</a>
     </div>
 </div>
 
@@ -59,7 +59,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="submit" class="modal-close waves-effect waves-green btn-flat">加入</button>
+            <button type="submit" class="modal-close waves-effect waves-green btn-flat">创建</button>
         </div>
     </form>
 </div>
@@ -69,9 +69,25 @@
 
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
-        var elems = document.querySelectorAll('.modal');
-        var instances = M.Modal.init(elems);
+        let elems = document.querySelectorAll('.modal');
+        M.Modal.init(elems);
     });
+
+    function enterLobby() {
+        let http = new XMLHttpRequest();
+        let params = `action=add_player&nickname=${document.getElementById('nickname').value}`;
+        http.open('PATCH', `lobbies/${document.getElementById('lobby_id').value}`, true);
+
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function() {
+            if(http.readyState === 4 && http.status === 200) {
+                let res = JSON.parse(http.responseText);
+                window.location.href=`lobbies/${document.getElementById('lobby_id').value}?player_id=${res.player_id}`
+            }
+        };
+        http.send(params);
+    }
 </script>
 </body>
 </html>

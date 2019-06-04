@@ -16,6 +16,7 @@ func initRouter(g *gin.Engine) {
 	lobby := g.Group("lobbies")
 	{
 		lobby.POST("", controllers.PostLobbyEntry)
+		lobby.PATCH(":lobby", controllers.PatchLobbyEntry)
 		lobby.GET(":lobby", controllers.GetLobbyEntry)
 	}
 }

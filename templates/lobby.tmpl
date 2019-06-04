@@ -1,0 +1,103 @@
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <link type="text/css" href="/statics/css/material_icon.css" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="/statics/css/materialize.min.css" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<body>
+<nav>
+    <div class="nav-wrapper blue-grey lighten-4">
+        <a href="#" class="brand-logo center blue-grey-text text-darken-2">狼の救济</a>
+    </div>
+</nav>
+<div class="row" style="margin-top: 24px;">
+    <div class="col s12 m6 {{.waiting_class}}" style="padding-left: 18px; padding-right: 18px;">
+        <div class="card-panel green lighten-5 center" style="padding-top: 4px;">
+            <h2 class="blue-text text-darken-2">⏰</h2>
+            <h6 class="green-text text-darken-2">等待下回开始</h6>
+        </div>
+    </div>
+    <div class="col s12 m6 {{.innocent_class}}" style="padding-left: 18px; padding-right: 18px;">
+        <div class="card-panel green lighten-5 center" style="padding-top: 4px;">
+            <h2 class="blue-text text-darken-2">👨</h2>
+            <h6 class="green-text text-darken-2">警惕狼人，保护自己</h6>
+        </div>
+    </div>
+    <div class="col s12 m6 {{.mafia_class}}" style="padding-left: 18px; padding-right: 18px;">
+        <div class="card-panel red lighten-5 center" style="padding-top: 4px;">
+            <h2 class="blue-text text-darken-2">🐺</h2>
+            <h4 class="red-text text-darken-2">关键词</h4>
+            <h6 class="red-text text-darken-2">找寻同伙，肃清平民</h6>
+        </div>
+    </div>
+    <div class="col s12 m6" style="padding-left: 18px; padding-right: 18px;">
+        <div class="card-panel grey lighten-5 center">
+            <h6 class="grey-text text-darken-2">第 <b>{{.round_number}}</b> 回合，共 <b>{{.player_count}}</b> 玩家</h6>
+            <h6 class="grey-text text-darken-2 {{.count_class}}"><b>{{.innocent_count}}</b> 👨，<b>{{.mafia_count}}</b> 🐺</h6>
+            <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}}" style="margin-top: 12px;"><i class="material-icons left">close</i>开始新回合</a>
+        </div>
+    </div>
+</div>
+
+<div style="padding-left: 32px;" class="grey-text lighten-2">
+    © 2019 E-Tiger Studio
+</div>
+
+<div id="end-round" class="modal">
+    <div class="modal-content">
+        您确定要结束本回合，并开始下一回合吗？
+    </div>
+    <div class="modal-footer">
+        <a onclick="startNextRound()" class="modal-close waves-effect waves-green btn-flat">确定</a>
+        <a class="modal-close waves-effect waves-green btn-flat">取消</a>
+    </div>
+</div>
+
+<div id="create-lobby" class="modal">
+    <form action="lobbies" method="post">
+        <div class="modal-content">
+            <div class="input-field">
+                <input id="nickname" name="nickname" type="text">
+                <label for="nickname">您的昵称</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="modal-close waves-effect waves-green btn-flat">加入</button>
+        </div>
+    </form>
+</div>
+
+<!--JavaScript at end of body for optimized loading-->
+<script type="text/javascript" src="/statics/js/materialize.min.js"></script>
+
+<script type="text/javascript">
+    let playerID = {{.player_id}};
+    let lobbyID = {{.lobby_id}};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        var instances = M.Modal.init(elems);
+    });
+
+    function startNextRound() {
+        let http = new XMLHttpRequest();
+        let params = `action=next_round&player_id=${playerID}`;
+        http.open('PATCH', `${lobbyID}`, true);
+
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function() {
+            if(http.readyState === 4 && http.status === 200) {
+                window.location.reload();
+            }
+        };
+        http.send(params);
+    }
+</script>
+</body>
+</html>
