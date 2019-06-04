@@ -18,6 +18,7 @@ pkg
 
 # Complied binary
 main
+*.zip
 
 # Temp folder
 tmp
