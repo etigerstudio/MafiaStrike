@@ -4,6 +4,11 @@
     <link type="text/css" href="/statics/css/material_icon.css" rel="stylesheet">
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="/statics/css/materialize.min.css" media="screen,projection"/>
+    <style type="text/css">
+        i.left {
+            margin-right: 4px;
+        }
+    </style>
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -36,16 +41,16 @@
         </div>
     </div>
     <div class="col s12 m6" style="padding-left: 18px; padding-right: 18px;">
-        <div class="card-panel grey lighten-5 center">
-            <h6 class="grey-text text-darken-2">第 <b>{{.round_number}}</b> 回合，共 <b>{{.player_count}}</b> 玩家</h6>
-            <h6 class="grey-text text-darken-2 {{.count_class}}"><b class="green-text text-darken-2">{{.innocent_count}}</b> 👨，<b class="red-text text-darken-2">{{.mafia_count}}</b> 🐺</h6>
-            <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">add</i>开始新回合</a>
-            <a onclick="M.Modal.getInstance(document.getElementById('edit-keywords')).open()" class="waves-effect waves-light blue btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">edit</i>编辑暗号</a>
-            <a onclick="showLastRound()" class="waves-effect waves-light blue btn {{.last_round_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">search</i>查看上回合</a>
-            <a onclick="showPlayerList()" class="waves-effect waves-light blue btn" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">group</i>查看玩家</a>
+        <div class="card-panel grey lighten-5 center" style="padding-left: 12px;padding-right: 12px;">
+            <h6 class="grey-text text-darken-3">第 <b>{{.round_number}}</b> 回合，共 <b>{{.player_count}}</b> 玩家</h6>
+            <h6 class="grey-text text-darken-3 {{.count_class}}"><b class="green-text text-darken-2">{{.innocent_count}}</b> 👨，<b class="red-text text-darken-3">{{.mafia_count}}</b> 🐺</h6>
+            <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">add</i>开始新回合</a>
+            <a onclick="M.Modal.getInstance(document.getElementById('edit-keywords')).open()" class="waves-effect waves-light blue btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">edit</i><span id="keywords-edit-label">添加暗号</span></a>
+            <a onclick="showLastRound()" class="waves-effect waves-light blue btn {{.last_round_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">search</i>查看上回合</a>
+            <a onclick="showPlayerList()" class="waves-effect waves-light blue btn" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">group</i>玩家列表</a>
         </div>
         <div class="center grey-text text-darken-1">
-            {{.player_nickname}} - 房间号 {{.lobby_id}}
+            当前玩家 <span class="grey-text text-darken-3">{{.player_nickname}}</span> · 房间号 <span class="grey-text text-darken-3">{{.lobby_id}}</span>
         </div>
     </div>
 </div>
@@ -68,8 +73,9 @@
 <div id="edit-keywords" class="modal">
     <div class="modal-content">
         <div class="input-field col s12">
+            <h5 class="blue-grey-text">暗号列表</h5>
+            <span class="grey-text">在暗号间使用空格进行分隔</span>
             <textarea id="keywords" class="materialize-textarea">{{.keyword_list}}</textarea>
-            <label for="keywords">暗号（空格分隔）</label>
         </div>
     </div>
     <div class="modal-footer">
@@ -110,6 +116,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         var elems = document.querySelectorAll('.modal');
         var instances = M.Modal.init(elems);
+        updateKeywordsButton()
     });
 
     function startNextRound() {
@@ -141,6 +148,7 @@
             return;
         }
 
+        updateKeywordsButton();
         let http = new XMLHttpRequest();
         let params = `action=update_keywords&keywords=${keywords}`;
         http.open('PATCH', `${lobbyID}`, true);
@@ -161,6 +169,16 @@
 
     function showLastRound() {
         M.Modal.getInstance(document.getElementById('last-round')).open()
+    }
+
+    function updateKeywordsButton() {
+        let keywords = document.getElementById('keywords').value;
+        if (keywords.trim() === '') {
+            document.getElementById('keywords-edit-label').innerText = `添加暗号`
+        } else {
+            let segments = keywords.split(" ");
+            document.getElementById('keywords-edit-label').innerText = `暗号(${segments.length})`
+        }
     }
 </script>
 </body>
