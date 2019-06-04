@@ -10,5 +10,5 @@ func Run() {
 	g := gin.Default()
 	g.LoadHTMLGlob("templates/*")
 	initRouter(g)
-	_ = g.Run("127.0.0.1:8888")
+	_ = g.Run("0.0.0.0:8888")
 }
