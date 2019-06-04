@@ -19,18 +19,18 @@
     <div class="col s12 m6 {{.waiting_class}}" style="padding-left: 18px; padding-right: 18px;">
         <div class="card-panel green lighten-5 center" style="padding-top: 4px;">
             <h2 class="blue-text text-darken-2">⏰</h2>
-            <h6 class="green-text text-darken-2">等待下回开始</h6>
+            <h6 class="green-text text-darken-2">等待房主开始下一回合</h6>
         </div>
     </div>
     <div class="col s12 m6 {{.innocent_class}}" style="padding-left: 18px; padding-right: 18px;">
         <div class="card-panel green lighten-5 center" style="padding-top: 4px;">
-            <h2 class="blue-text text-darken-2">👨</h2>
+            <h2 class="green-text text-darken-2">👨</h2>
             <h6 class="green-text text-darken-2">警惕狼人，保护自己</h6>
         </div>
     </div>
     <div class="col s12 m6 {{.mafia_class}}" style="padding-left: 18px; padding-right: 18px;">
         <div class="card-panel red lighten-5 center" style="padding-top: 4px;">
-            <h2 class="blue-text text-darken-2">🐺</h2>
+            <h2 class="red-text text-darken-2">🐺</h2>
             <h4 class="red-text text-darken-2">{{.mafia_keyword}}</h4>
             <h6 class="red-text text-darken-2">找寻同伙，肃清平民</h6>
         </div>
@@ -38,14 +38,20 @@
     <div class="col s12 m6" style="padding-left: 18px; padding-right: 18px;">
         <div class="card-panel grey lighten-5 center">
             <h6 class="grey-text text-darken-2">第 <b>{{.round_number}}</b> 回合，共 <b>{{.player_count}}</b> 玩家</h6>
-            <h6 class="grey-text text-darken-2 {{.count_class}}"><b>{{.innocent_count}}</b> 👨，<b>{{.mafia_count}}</b> 🐺</h6>
-            <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}}" style="margin-top: 12px;"><i class="material-icons left">close</i>开始新回合</a>
-            <a onclick="M.Modal.getInstance(document.getElementById('edit-keywords')).open()" class="waves-effect waves-light blue btn {{.creator_class}}" style="margin-top: 12px;"><i class="material-icons left">edit</i>编辑关键词</a>
+            <h6 class="grey-text text-darken-2 {{.count_class}}"><b class="green-text text-darken-2">{{.innocent_count}}</b> 👨，<b class="red-text text-darken-2">{{.mafia_count}}</b> 🐺</h6>
+            <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">add</i>开始新回合</a>
+            <a onclick="M.Modal.getInstance(document.getElementById('edit-keywords')).open()" class="waves-effect waves-light blue btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">edit</i>编辑暗号</a>
+            <a onclick="showLastRound()" class="waves-effect waves-light blue btn {{.last_round_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">search</i>查看上回合</a>
+            <a onclick="showPlayerList()" class="waves-effect waves-light blue btn" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;"><i class="material-icons left">group</i>查看玩家</a>
+        </div>
+        <div class="center grey-text text-darken-1">
+            {{.player_nickname}} - 房间号 {{.lobby_id}}
         </div>
     </div>
 </div>
 
-<div style="padding-left: 32px;" class="grey-text lighten-2">
+
+<div style="padding-left: 32px;" class="grey-text">
     © 2019 E-Tiger Studio
 </div>
 
@@ -54,8 +60,8 @@
         您确定要结束本回合，并开始下一回合吗？
     </div>
     <div class="modal-footer">
-        <a onclick="startNextRound()" class="modal-close waves-effect waves-green btn-flat">确定</a>
-        <a class="modal-close waves-effect waves-green btn-flat">取消</a>
+        <a onclick="startNextRound()" class="modal-close waves-effect btn-flat">确定</a>
+        <a class="modal-close waves-effect btn-flat">取消</a>
     </div>
 </div>
 
@@ -63,12 +69,34 @@
     <div class="modal-content">
         <div class="input-field col s12">
             <textarea id="keywords" class="materialize-textarea">{{.keyword_list}}</textarea>
-            <label for="keywords">关键词（空格分隔）</label>
+            <label for="keywords">暗号（空格分隔）</label>
         </div>
     </div>
     <div class="modal-footer">
-        <a onclick="updateKeywords()" class="modal-close waves-effect waves-green btn-flat">确定</a>
-        <a class="modal-close waves-effect waves-green btn-flat">取消</a>
+        <a onclick="updateKeywords()" class="modal-close waves-effect btn-flat">确定</a>
+        <a class="modal-close waves-effect btn-flat">取消</a>
+    </div>
+</div>
+
+<div id="player-list" class="modal">
+    <div class="modal-content">
+        <h5 class="blue-grey-text">玩家列表</h5>
+        {{.player_list}}
+    </div>
+    <div class="modal-footer">
+        <a class="modal-close waves-effect btn-flat">关闭</a>
+    </div>
+</div>
+
+<div id="last-round" class="modal">
+    <div class="modal-content">
+        <h5 class="blue-grey-text">上局暗号</h5>
+        <b>{{.last_keyword}}</b>
+        <h5 class="blue-grey-text">上局狼人</h5>
+        {{.last_mafias}}
+    </div>
+    <div class="modal-footer">
+        <a class="modal-close waves-effect btn-flat">关闭</a>
     </div>
 </div>
 
@@ -98,7 +126,7 @@
                 } else {
                     let res = JSON.parse(http.responseText);
                     if (res.error === "no-keyword") {
-                        M.toast({html: '<b>没有可用的游戏关键词</b><button onclick="M.Modal.getInstance(document.getElementById(\'edit-keywords\')).open()" class="btn-flat toast-action blue-text">添加</button>'})
+                        M.toast({html: '<b>没有可用的游戏暗号</b><button onclick="M.Modal.getInstance(document.getElementById(\'edit-keywords\')).open()" class="btn-flat toast-action blue-text">添加</button>'})
                     }
                 }
             }
@@ -109,7 +137,7 @@
     function updateKeywords() {
         let keywords = document.getElementById('keywords').value;
         if (keywords.trim() === '') {
-            M.toast({html: '<b>关键词不能为空</b>'});
+            M.toast({html: '<b>暗号不能为空</b>'});
             return;
         }
 
@@ -125,6 +153,14 @@
             }
         };
         http.send(params);
+    }
+
+    function showPlayerList() {
+        M.Modal.getInstance(document.getElementById('player-list')).open()
+    }
+
+    function showLastRound() {
+        M.Modal.getInstance(document.getElementById('last-round')).open()
     }
 </script>
 </body>

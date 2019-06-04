@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"html/template"
 	"mafia-strike/consts"
 	"mafia-strike/models"
 	"mafia-strike/util"
@@ -62,7 +63,7 @@ func PatchLobbyEntry(c *gin.Context) {
 	case consts.LobbyPatchActionUpdateKeywords:
 		keywords := util.MustGetPostForm(consts.RequestPostFormKeywords, c)
 
-		lobby.Keywords = strings.Split(keywords, consts.LobbyKeywordSeparator)
+		lobby.Keywords = strings.Split(keywords, consts.StringKeywordsSeparator)
 		c.String(http.StatusOK, "")
 		return
 	}
@@ -106,8 +107,20 @@ func GetLobbyEntry(c *gin.Context) {
 	params["player_count"] = lobby.PlayerCount()
 	params["creator_class"] = classForShouldHide(!player.IsCreator)
 	params["player_id"] = playerID
+	params["player_nickname"] = player.Nickname
+	playerListSegments := []string{}
+	for _, p := range lobby.Players {
+		playerListSegments = append(playerListSegments, p.Nickname)
+	}
+	params["player_list"] = template.HTML(strings.Join(playerListSegments, consts.StringHTMLLineBreak))
+	if lobby.Round > 1 {
+		params["last_keyword"] = lobby.PrevWord
+		params["last_mafias"] = template.HTML(strings.Join(lobby.PrevMafias, consts.StringHTMLLineBreak))
+	} else {
+		params["last_round_class"] = classForShouldHide(true)
+	}
 	params["lobby_id"] = lobbyID
-	params["keyword_list"] = strings.Join(lobby.Keywords, consts.LobbyKeywordSeparator)
+	params["keyword_list"] = strings.Join(lobby.Keywords, consts.StringKeywordsSeparator)
 	c.HTML(http.StatusOK, "lobby.tmpl", params)
 }
 

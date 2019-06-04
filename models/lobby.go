@@ -15,6 +15,7 @@ type Lobby struct{
 	Keywords []string
 	CurrentWord string
 	PrevWord string
+	PrevMafias []string
 	Round int
 }
 
@@ -57,7 +58,6 @@ func (l *Lobby) StartNewRound() error {
 	l.CurrentWord, l.Keywords = l.Keywords[0], l.Keywords[1:]
 
 	mafiaCount := l.NextMafiaCount()
-	util.Infoln("mafia count: ", mafiaCount)
 
 	mafias := []string{}
 	playersCopy := []string{}
@@ -70,14 +70,18 @@ func (l *Lobby) StartNewRound() error {
 		mafias = append(mafias, playersCopy[mafia])
 		playersCopy = util.RemoveSliceElement(playersCopy, mafia)
 	}
-	util.Infoln("mafias: ", mafias)
+
+	l.PrevMafias = []string{}
 
 	for id, p := range l.Players {
+		if p.IsActive && p.IsMafia {
+			l.PrevMafias = append(l.PrevMafias, p.Nickname)
+		}
+
 		mafiaMatched := false
 		for _, m := range mafias {
 			if m == id {
 				mafiaMatched = true
-				util.Infoln("new mafia: ", p.Nickname)
 			}
 		}
 		if mafiaMatched {

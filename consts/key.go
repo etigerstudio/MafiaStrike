@@ -43,5 +43,6 @@ const (
 )
 
 const (
-	LobbyKeywordSeparator           = " "
+	StringKeywordsSeparator         = " "
+	StringHTMLLineBreak             = "<br />"
 )
