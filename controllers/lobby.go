@@ -7,6 +7,7 @@ import (
 	"mafia-strike/models"
 	"mafia-strike/util"
 	"net/http"
+	"strings"
 )
 
 func PostLobbyEntry(c *gin.Context) {
@@ -29,13 +30,13 @@ func PatchLobbyEntry(c *gin.Context) {
 
 	switch action {
 	case consts.LobbyPatchActionAddPlayer:
-		nickname := util.MustGetPostForm(consts.RequestPostFormNickname ,c)
+		nickname := util.MustGetPostForm(consts.RequestPostFormNickname, c)
 
 		playerID := lobby.AddPlayer(nickname, false)
 		c.JSON(http.StatusOK, gin.H{"player_id": playerID})
 		return
 	case consts.LobbyPatchActionNextRound:
-		playerID := util.MustGetPostForm(consts.RequestPostFormPlayerID,c)
+		playerID := util.MustGetPostForm(consts.RequestPostFormPlayerID, c)
 
 		player, ok := lobby.Players[playerID]
 		if !ok {
@@ -48,7 +49,17 @@ func PatchLobbyEntry(c *gin.Context) {
 			return
 		}
 
-		lobby.StartNewRound()
+		err := lobby.StartNewRound()
+		if err != nil {
+			c.JSON(http.StatusForbidden, gin.H{consts.ResponseKeyError: consts.ResponseErrorDescNoKeyword})
+			return
+		}
+		c.String(http.StatusOK, "")
+		return
+	case consts.LobbyPatchActionUpdateKeywords:
+		keywords := util.MustGetPostForm(consts.RequestPostFormKeywords, c)
+
+		lobby.Keywords = strings.Split(keywords, consts.LobbyKeywordSeparator)
 		c.String(http.StatusOK, "")
 		return
 	}
@@ -79,6 +90,9 @@ func GetLobbyEntry(c *gin.Context) {
 		params["mafia_class"] = classForShouldHide(!player.IsMafia)
 		params["innocent_count"] = lobby.PlayerCount() - lobby.CurrentMafiaCount()
 		params["mafia_count"] = lobby.CurrentMafiaCount()
+		if player.IsMafia {
+			params["mafia_keyword"] = lobby.CurrentWord
+		}
 	} else {
 		params["waiting_class"] = classForShouldHide(false)
 		params["innocent_class"] = classForShouldHide(true)
@@ -90,6 +104,7 @@ func GetLobbyEntry(c *gin.Context) {
 	params["creator_class"] = classForShouldHide(!player.IsCreator)
 	params["player_id"] = playerID
 	params["lobby_id"] = lobbyID
+	params["keyword_list"] = strings.Join(lobby.Keywords, consts.LobbyKeywordSeparator)
 	c.HTML(http.StatusOK, "lobby.tmpl", params)
 }
 

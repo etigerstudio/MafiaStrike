@@ -31,7 +31,7 @@
     <div class="col s12 m6 {{.mafia_class}}" style="padding-left: 18px; padding-right: 18px;">
         <div class="card-panel red lighten-5 center" style="padding-top: 4px;">
             <h2 class="blue-text text-darken-2">🐺</h2>
-            <h4 class="red-text text-darken-2">关键词</h4>
+            <h4 class="red-text text-darken-2">{{.mafia_keyword}}</h4>
             <h6 class="red-text text-darken-2">找寻同伙，肃清平民</h6>
         </div>
     </div>
@@ -40,6 +40,7 @@
             <h6 class="grey-text text-darken-2">第 <b>{{.round_number}}</b> 回合，共 <b>{{.player_count}}</b> 玩家</h6>
             <h6 class="grey-text text-darken-2 {{.count_class}}"><b>{{.innocent_count}}</b> 👨，<b>{{.mafia_count}}</b> 🐺</h6>
             <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}}" style="margin-top: 12px;"><i class="material-icons left">close</i>开始新回合</a>
+            <a onclick="M.Modal.getInstance(document.getElementById('edit-keywords')).open()" class="waves-effect waves-light blue btn {{.creator_class}}" style="margin-top: 12px;"><i class="material-icons left">edit</i>编辑关键词</a>
         </div>
     </div>
 </div>
@@ -58,18 +59,17 @@
     </div>
 </div>
 
-<div id="create-lobby" class="modal">
-    <form action="lobbies" method="post">
-        <div class="modal-content">
-            <div class="input-field">
-                <input id="nickname" name="nickname" type="text">
-                <label for="nickname">您的昵称</label>
-            </div>
+<div id="edit-keywords" class="modal">
+    <div class="modal-content">
+        <div class="input-field col s12">
+            <textarea id="keywords" class="materialize-textarea">{{.keyword_list}}</textarea>
+            <label for="keywords">关键词（空格分隔）</label>
         </div>
-        <div class="modal-footer">
-            <button type="submit" class="modal-close waves-effect waves-green btn-flat">加入</button>
-        </div>
-    </form>
+    </div>
+    <div class="modal-footer">
+        <a onclick="updateKeywords()" class="modal-close waves-effect waves-green btn-flat">确定</a>
+        <a class="modal-close waves-effect waves-green btn-flat">取消</a>
+    </div>
 </div>
 
 <!--JavaScript at end of body for optimized loading-->
@@ -92,7 +92,29 @@
         http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
         http.onreadystatechange = function() {
-            if(http.readyState === 4 && http.status === 200) {
+            if (http.readyState === 4) {
+                if (http.status === 200) {
+                    window.location.reload();
+                } else {
+                    let res = JSON.parse(http.responseText);
+                    if (res.error === "no-keyword") {
+                        M.toast({html: '<b>没有可用的游戏关键词</b><button onclick="M.Modal.getInstance(document.getElementById(\'edit-keywords\')).open()" class="btn-flat toast-action blue-text">添加</button>'})
+                    }
+                }
+            }
+        };
+        http.send(params);
+    }
+
+    function updateKeywords() {
+        let http = new XMLHttpRequest();
+        let params = `action=update_keywords&keywords=${document.getElementById("keywords").value}`;
+        http.open('PATCH', `${lobbyID}`, true);
+
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function() {
+            if (http.readyState === 4 && http.status === 200) {
                 window.location.reload();
             }
         };

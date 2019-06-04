@@ -15,11 +15,13 @@ const (
 	RequestPostFormNickname    = "nickname"
 	RequestPostFormAction      = "action"
 	RequestPostFormPlayerID    = "player_id"
+	RequestPostFormKeywords    = "keywords"
 )
 
 const (
-	LobbyPatchActionAddPlayer  = "add_player"
-	LobbyPatchActionNextRound  = "next_round"
+	LobbyPatchActionAddPlayer       = "add_player"
+	LobbyPatchActionNextRound       = "next_round"
+	LobbyPatchActionUpdateKeywords  = "update_keywords"
 )
 
 const (
@@ -28,4 +30,16 @@ const (
 
 const (
 	ErrorUniversal             = "出错啦"
+)
+
+const (
+	ResponseKeyError                = "error"
+)
+
+const (
+	ResponseErrorDescNoKeyword      = "no-keyword"
+)
+
+const (
+	LobbyKeywordSeparator           = " "
 )

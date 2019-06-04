@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+	"mafia-strike/consts"
 	"mafia-strike/util"
 	"math/rand"
 )
@@ -43,7 +45,17 @@ func (l *Lobby) AddPlayer(nickname string, creator bool) string {
 	return playerID
 }
 
-func (l *Lobby) StartNewRound() {
+func (l *Lobby) StartNewRound() error {
+	if len(l.Keywords) == 0 {
+		return errors.New(consts.ResponseErrorDescNoKeyword)
+	}
+
+	if l.CurrentWord != "" {
+		l.PrevWord = l.CurrentWord
+	}
+
+	l.CurrentWord, l.Keywords = l.Keywords[0], l.Keywords[1:]
+
 	mafiaCount := l.NextMafiaCount()
 	util.Infoln("mafia count: ", mafiaCount)
 
@@ -77,6 +89,7 @@ func (l *Lobby) StartNewRound() {
 	}
 
 	l.Round++
+	return nil
 }
 
 type Player struct {
@@ -88,12 +101,7 @@ type Player struct {
 
 func NewLobby() (*Lobby, int) {
 	lobby := Lobby{}
-	lobby.Players = map[string]*Player{
-		"dsad": {Nickname: "aa"},
-		"nnn": {Nickname: "b"},
-		"bbb": {Nickname: "c"},
-		"sd": {Nickname: "d"},
-	}
+	lobby.Players = map[string]*Player{}
 
 	lobbyID := lobbyCount + 1
 	Lobbies[lobbyID] = &lobby
