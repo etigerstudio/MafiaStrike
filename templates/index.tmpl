@@ -1,0 +1,61 @@
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <link type="text/css" href="/statics/css/material_icon.css" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="/statics/css/materialize.min.css" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<body>
+<nav>
+    <div class="nav-wrapper blue-grey lighten-4">
+        <a href="#" class="brand-logo center blue-grey-text text-darken-2">狼の救济</a>
+    </div>
+</nav>
+<div class="row" style="margin-top: 24px;">
+    <div class="col s12 m6" style="padding-left: 18px; padding-right: 18px;">
+        <div class="card-panel blue lighten-5 center">
+            <div class="blue-text text-darken-2">创建新的房间</div>
+            <form action="lobby" method="post">
+                <button type="submit" class="waves-effect waves-light blue btn" style="margin-top: 12px;"><i class="material-icons left">add</i>创建房间</button>
+            </form>
+        </div>
+    </div>
+    <div class="col s12 m6" style="padding-left: 18px; padding-right: 18px;">
+        <div class="card-panel green lighten-5 center">
+            <div class="green-text text-darken-2">加入已创建的房间</div>
+            <a onclick="M.Modal.getInstance(document.getElementById('join-lobby')).open()" class="waves-effect waves-light green btn center" style="margin-top: 12px;"><i class="material-icons left">group_add</i>加入房间</a>
+        </div>
+    </div>
+</div>
+
+<div style="padding-left: 32px;" class="grey-text lighten-2">
+    © 2019 E-Tiger Studio
+</div>
+
+<div id="join-lobby" class="modal">
+    <div class="modal-content">
+        <div class="input-field">
+            <input id="lobby_id" type="text">
+            <label for="lobby_id">请输入房间号</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a onclick="window.location.href=`lobby/${document.getElementById('lobby_id').value}`" class="modal-close waves-effect waves-green btn-flat">加入</a>
+    </div>
+</div>
+
+<!--JavaScript at end of body for optimized loading-->
+<script type="text/javascript" src="/statics/js/materialize.min.js"></script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        var instances = M.Modal.init(elems);
+    });
+</script>
+</body>
+</html>
