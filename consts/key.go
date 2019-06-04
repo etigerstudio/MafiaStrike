@@ -34,6 +34,8 @@ const (
 
 const (
 	ResponseKeyError                = "error"
+	ResponseKeyPlayerID             = "player_id"
+	ResponseKeyLobbyID              = "lobby_id"
 )
 
 const (

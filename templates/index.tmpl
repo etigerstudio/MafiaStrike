@@ -41,8 +41,8 @@
             <label for="lobby_id">要加入的房间号</label>
         </div>
         <div class="input-field">
-            <input id="nickname" type="text">
-            <label for="nickname">您的昵称</label>
+            <input id="nickname_join" type="text">
+            <label for="nickname_join">您的昵称</label>
         </div>
     </div>
     <div class="modal-footer">
@@ -51,17 +51,15 @@
 </div>
 
 <div id="create-lobby" class="modal">
-    <form action="lobbies" method="post">
-        <div class="modal-content">
-            <div class="input-field">
-                <input id="nickname" name="nickname" type="text">
-                <label for="nickname">您的昵称</label>
-            </div>
+    <div class="modal-content">
+        <div class="input-field">
+            <input id="nickname_create" type="text">
+            <label for="nickname_create">您的昵称</label>
         </div>
-        <div class="modal-footer">
-            <button type="submit" class="modal-close waves-effect waves-green btn-flat">创建</button>
-        </div>
-    </form>
+    </div>
+    <div class="modal-footer">
+        <a onclick="createLobby()" class="modal-close waves-effect waves-green btn-flat">创建</a>
+    </div>
 </div>
 
 <!--JavaScript at end of body for optimized loading-->
@@ -73,17 +71,52 @@
         M.Modal.init(elems);
     });
 
-    function enterLobby() {
+    function createLobby() {
+        let nickname = document.getElementById('nickname_create').value;
+        if (nickname.trim() === '') {
+            M.toast({html: '<b>昵称不能为空</b>'});
+            return;
+        }
+
         let http = new XMLHttpRequest();
-        let params = `action=add_player&nickname=${document.getElementById('nickname').value}`;
-        http.open('PATCH', `lobbies/${document.getElementById('lobby_id').value}`, true);
+        let params = `action=add_player&nickname=${nickname}`;
+        http.open('POST', `lobbies/`, true);
 
         http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
         http.onreadystatechange = function() {
             if(http.readyState === 4 && http.status === 200) {
                 let res = JSON.parse(http.responseText);
-                window.location.href=`lobbies/${document.getElementById('lobby_id').value}?player_id=${res.player_id}`
+                window.location.href=`lobbies/${res.lobby_id}?player_id=${res.player_id}`
+            }
+        };
+
+        http.send(params);
+    }
+
+    function enterLobby() {
+        let lobbyID = document.getElementById('lobby_id').value;
+        if (lobbyID.trim() === '') {
+            M.toast({html: '<b>房间号不能为空</b>'});
+            return;
+        }
+
+        let nickname = document.getElementById('nickname_join').value;
+        if (nickname.trim() === '') {
+            M.toast({html: '<b>昵称不能为空</b>'});
+            return;
+        }
+
+        let http = new XMLHttpRequest();
+        let params = `action=add_player&nickname=${nickname}`;
+        http.open('PATCH', `lobbies/${lobbyID}`, true);
+
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function() {
+            if(http.readyState === 4 && http.status === 200) {
+                let res = JSON.parse(http.responseText);
+                window.location.href=`lobbies/${lobbyID}?player_id=${res.player_id}`
             }
         };
         http.send(params);

@@ -107,8 +107,14 @@
     }
 
     function updateKeywords() {
+        let keywords = document.getElementById('keywords').value;
+        if (keywords.trim() === '') {
+            M.toast({html: '<b>关键词不能为空</b>'});
+            return;
+        }
+
         let http = new XMLHttpRequest();
-        let params = `action=update_keywords&keywords=${document.getElementById("keywords").value}`;
+        let params = `action=update_keywords&keywords=${keywords}`;
         http.open('PATCH', `${lobbyID}`, true);
 
         http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');

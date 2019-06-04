@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"mafia-strike/consts"
 	"mafia-strike/models"
@@ -15,7 +14,11 @@ func PostLobbyEntry(c *gin.Context) {
 
 	lobby, lobbyID := models.NewLobby()
 	playerID := lobby.AddPlayer(nickname, true)
-	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/lobbies/%d?player_id=%s", lobbyID, playerID))
+
+	c.JSON(http.StatusOK, gin.H{
+		consts.ResponseKeyLobbyID: lobbyID,
+		consts.ResponseKeyPlayerID: playerID,
+	})
 }
 
 func PatchLobbyEntry(c *gin.Context) {
@@ -33,7 +36,7 @@ func PatchLobbyEntry(c *gin.Context) {
 		nickname := util.MustGetPostForm(consts.RequestPostFormNickname, c)
 
 		playerID := lobby.AddPlayer(nickname, false)
-		c.JSON(http.StatusOK, gin.H{"player_id": playerID})
+		c.JSON(http.StatusOK, gin.H{consts.ResponseKeyPlayerID: playerID})
 		return
 	case consts.LobbyPatchActionNextRound:
 		playerID := util.MustGetPostForm(consts.RequestPostFormPlayerID, c)
