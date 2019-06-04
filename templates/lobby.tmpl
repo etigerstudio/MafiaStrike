@@ -22,9 +22,9 @@
 </nav>
 <div class="row" style="margin-top: 24px;">
     <div class="col s12 m6 {{.waiting_class}}" style="padding-left: 18px; padding-right: 18px;">
-        <div class="card-panel green lighten-5 center" style="padding-top: 4px;">
+        <div class="card-panel blue lighten-5 center" style="padding-top: 4px;">
             <h2 class="blue-text text-darken-2">⏰</h2>
-            <h6 class="green-text text-darken-2">等待房主开始下一回合</h6>
+            <h6 class="blue-text text-darken-2">等待房主开始下一回合</h6>
         </div>
     </div>
     <div class="col s12 m6 {{.innocent_class}}" style="padding-left: 18px; padding-right: 18px;">
@@ -44,8 +44,9 @@
         <div class="card-panel grey lighten-5 center" style="padding-left: 12px;padding-right: 12px;">
             <h6 class="grey-text text-darken-3">第 <b>{{.round_number}}</b> 回合，共 <b>{{.player_count}}</b> 玩家</h6>
             <h6 class="grey-text text-darken-3 {{.count_class}}"><b class="green-text text-darken-2">{{.innocent_count}}</b> 👨，<b class="red-text text-darken-3">{{.mafia_count}}</b> 🐺</h6>
-            <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">add</i>开始新回合</a>
-            <a onclick="M.Modal.getInstance(document.getElementById('edit-keywords')).open()" class="waves-effect waves-light blue btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">edit</i><span id="keywords-edit-label">添加暗号</span></a>
+            <a onclick="M.Modal.getInstance(document.getElementById('end-round')).open()" class="waves-effect waves-light red btn {{.creator_class}} {{.end_round_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">close</i>结束本回合</a>
+            <a onclick="M.Modal.getInstance(document.getElementById('start-new-round')).open()" class="waves-effect waves-light green btn {{.creator_class}} {{.start_new_round_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">add</i>开始新回合</a>
+            <a onclick="M.Modal.getInstance(document.getElementById('edit-keywords')).open()" class="waves-effect waves-light orange darken-3 btn {{.creator_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">edit</i><span id="keywords-edit-label">添加暗号</span></a>
             <a onclick="showLastRound()" class="waves-effect waves-light blue btn {{.last_round_class}}" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">search</i>查看上回合</a>
             <a onclick="showPlayerList()" class="waves-effect waves-light blue btn" style="margin-top: 12px;margin-left: 4px;margin-right: 4px;width: 140px;"><i class="material-icons left">group</i>玩家列表</a>
         </div>
@@ -62,7 +63,21 @@
 
 <div id="end-round" class="modal">
     <div class="modal-content">
-        您确定要结束本回合，并开始下一回合吗？
+        <h5 class="blue-grey-text text-darken-1">结束本回合</h5>
+        <span class="grey-text text-darken-3">选择本回合结果，为获胜玩家加分。</span>
+    </div>
+    <div class="modal-footer">
+        <a onclick="submitResult('men')" class="modal-close waves-effect btn-flat green-text">平民胜</a>
+        <a onclick="submitResult('mafias')" class="modal-close waves-effect btn-flat red-text">狼人胜</a>
+        <a onclick="submitResult('draw')" class="modal-close waves-effect btn-flat">平局</a>
+        <a class="modal-close waves-effect btn-flat">取消</a>
+    </div>
+</div>
+
+<div id="start-new-round" class="modal">
+    <div class="modal-content">
+        <h5 class="blue-grey-text text-darken-1">开始新回合</h5>
+        <span class="grey-text text-darken-3">您确定要开始下一回合吗？</span>
     </div>
     <div class="modal-footer">
         <a onclick="startNextRound()" class="modal-close waves-effect btn-flat">确定</a>
@@ -73,9 +88,10 @@
 <div id="edit-keywords" class="modal">
     <div class="modal-content">
         <div class="input-field col s12">
-            <h5 class="blue-grey-text">暗号列表</h5>
-            <span class="grey-text">在暗号间使用空格进行分隔</span>
+            <h5 class="blue-grey-text text-darken-1">暗号列表</h5>
+            <span class="grey-text text-darken-3">在暗号间使用空格进行分隔</span>
             <textarea id="keywords" class="materialize-textarea">{{.keyword_list}}</textarea>
+            <label for="keywords"></label>
         </div>
     </div>
     <div class="modal-footer">
@@ -86,8 +102,8 @@
 
 <div id="player-list" class="modal">
     <div class="modal-content">
-        <h5 class="blue-grey-text">玩家列表</h5>
-        {{.player_list}}
+        <h5 class="blue-grey-text text-darken-1">玩家列表</h5>
+        <div id="player-list-container"></div>
     </div>
     <div class="modal-footer">
         <a class="modal-close waves-effect btn-flat">关闭</a>
@@ -96,9 +112,9 @@
 
 <div id="last-round" class="modal">
     <div class="modal-content">
-        <h5 class="blue-grey-text">上局暗号</h5>
+        <h5 class="blue-grey-text text-darken-1">上局暗号</h5>
         <b>{{.last_keyword}}</b>
-        <h5 class="blue-grey-text">上局狼人</h5>
+        <h5 class="blue-grey-text text-darken-1">上局狼人</h5>
         {{.last_mafias}}
     </div>
     <div class="modal-footer">
@@ -112,11 +128,13 @@
 <script type="text/javascript">
     let playerID = {{.player_id}};
     let lobbyID = {{.lobby_id}};
+    let playerList = {{.player_list}}
 
     document.addEventListener('DOMContentLoaded', function() {
         var elems = document.querySelectorAll('.modal');
         var instances = M.Modal.init(elems);
-        updateKeywordsButton()
+        updateKeywordsButton();
+        updatePlayerList();
     });
 
     function startNextRound() {
@@ -136,6 +154,21 @@
                         M.toast({html: '<b>没有可用的游戏暗号</b><button onclick="M.Modal.getInstance(document.getElementById(\'edit-keywords\')).open()" class="btn-flat toast-action blue-text">添加</button>'})
                     }
                 }
+            }
+        };
+        http.send(params);
+    }
+
+    function submitResult(winner) {
+        let http = new XMLHttpRequest();
+        let params = `action=submit_result&player_id=${playerID}&winner=${winner}`;
+        http.open('PATCH', `${lobbyID}`, true);
+
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function() {
+            if (http.readyState === 4 && http.status === 200) {
+                window.location.reload();
             }
         };
         http.send(params);
@@ -179,6 +212,16 @@
             let segments = keywords.split(" ");
             document.getElementById('keywords-edit-label').innerText = `暗号(${segments.length})`
         }
+    }
+
+    function updatePlayerList() {
+        let container = document.getElementById("player-list-container");
+        playerList.sort((a, b) => (a.score > b.score) ? -1 : (b.score > a.score) ? 1 : 0);
+        let innerHTML = [];
+        for (let player of playerList) {
+            innerHTML.push(`<span class="left">${player.nickname}</span><span class="right">${player.score}</span>`);
+        }
+        container.innerHTML = innerHTML.join(`<br/>`)
     }
 </script>
 </body>

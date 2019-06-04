@@ -16,12 +16,20 @@ const (
 	RequestPostFormAction      = "action"
 	RequestPostFormPlayerID    = "player_id"
 	RequestPostFormKeywords    = "keywords"
+	RequestPostFormWinner      = "winner"
 )
 
 const (
 	LobbyPatchActionAddPlayer       = "add_player"
 	LobbyPatchActionNextRound       = "next_round"
 	LobbyPatchActionUpdateKeywords  = "update_keywords"
+	LobbyPatchActionSubmitResult    = "submit_result"
+)
+
+const (
+	GameWinnerMen                   = "men"
+	GameWinnerMafias                = "mafias"
+	GameWinnerDraw                  = "draw"
 )
 
 const (

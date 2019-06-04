@@ -17,6 +17,7 @@ type Lobby struct{
 	PrevWord string
 	PrevMafias []string
 	Round int
+	IsRoundEnded bool
 }
 
 func (l *Lobby) PlayerCount() int {
@@ -93,7 +94,30 @@ func (l *Lobby) StartNewRound() error {
 	}
 
 	l.Round++
+	l.IsRoundEnded = false
 	return nil
+}
+
+func (l *Lobby) SubmitResult(winner string) {
+	switch winner {
+	case consts.GameWinnerMen:
+		for _, p := range l.Players {
+			if !p.IsMafia {
+				p.Score++
+			}
+		}
+	case consts.GameWinnerMafias:
+		for _, p := range l.Players {
+			if p.IsMafia {
+				p.Score++
+			}
+		}
+	case consts.GameWinnerDraw:
+		for _, p := range l.Players {
+			p.Score++
+		}
+	}
+	l.IsRoundEnded = true
 }
 
 type Player struct {
@@ -101,11 +125,21 @@ type Player struct {
 	 IsMafia   bool
 	 IsActive  bool
 	 IsCreator bool
+	 Score int
 }
 
 func NewLobby() (*Lobby, int) {
 	lobby := Lobby{}
 	lobby.Players = map[string]*Player{}
+	//lobby.Players = map[string]*Player{
+	//	"1": {Nickname: "a"},
+	//	"2": {Nickname: "b"},
+	//	"3": {Nickname: "c"},
+	//	"4": {Nickname: "d"},
+	//	"5": {Nickname: "e"},
+	//	"6": {Nickname: "f"},
+	//}
+	lobby.IsRoundEnded = true
 
 	lobbyID := lobbyCount + 1
 	Lobbies[lobbyID] = &lobby

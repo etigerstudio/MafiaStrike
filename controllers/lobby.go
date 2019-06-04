@@ -7,6 +7,7 @@ import (
 	"mafia-strike/models"
 	"mafia-strike/util"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -66,6 +67,24 @@ func PatchLobbyEntry(c *gin.Context) {
 		lobby.Keywords = strings.Split(keywords, consts.StringKeywordsSeparator)
 		c.String(http.StatusOK, "")
 		return
+	case consts.LobbyPatchActionSubmitResult:
+		playerID := util.MustGetPostForm(consts.RequestPostFormPlayerID, c)
+		winner := util.MustGetPostForm(consts.RequestPostFormWinner, c)
+
+		player, ok := lobby.Players[playerID]
+		if !ok {
+			util.ErrorMessageUniversal(c)
+			return
+		}
+
+		if !player.IsCreator {
+			util.ErrorMessageUniversal(c)
+			return
+		}
+
+		lobby.SubmitResult(winner)
+		c.String(http.StatusOK, "")
+		return
 	}
 
 	util.ErrorMessageUniversal(c)
@@ -88,7 +107,7 @@ func GetLobbyEntry(c *gin.Context) {
 	}
 
 	params := gin.H{}
-	if player.IsActive {
+	if player.IsActive && !lobby.IsRoundEnded {
 		params["waiting_class"] = classForShouldHide(true)
 		params["innocent_class"] = classForShouldHide(player.IsMafia)
 		params["mafia_class"] = classForShouldHide(!player.IsMafia)
@@ -108,11 +127,18 @@ func GetLobbyEntry(c *gin.Context) {
 	params["creator_class"] = classForShouldHide(!player.IsCreator)
 	params["player_id"] = playerID
 	params["player_nickname"] = player.Nickname
-	playerListSegments := []string{}
+	playerListStr := ""
 	for _, p := range lobby.Players {
-		playerListSegments = append(playerListSegments, p.Nickname)
+		playerListStr += `{"nickname":"` + p.Nickname +
+			`","score":` + strconv.Itoa(p.Score) + `},`
 	}
-	params["player_list"] = template.HTML(strings.Join(playerListSegments, consts.StringHTMLLineBreak))
+	params["player_list"] = template.JS("[" + playerListStr + "]")
+	if lobby.Round == 0 || lobby.IsRoundEnded {
+		params["end_round_class"] = classForShouldHide(true)
+	}
+	if !lobby.IsRoundEnded {
+		params["start_new_round_class"] = classForShouldHide(true)
+	}
 	if lobby.Round > 1 {
 		params["last_keyword"] = lobby.PrevWord
 		params["last_mafias"] = template.HTML(strings.Join(lobby.PrevMafias, consts.StringHTMLLineBreak))
