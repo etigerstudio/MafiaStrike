@@ -39,6 +39,12 @@ func (l *Lobby) CurrentMafiaCount() int {
 }
 
 func (l *Lobby) AddPlayer(nickname string, creator bool) string {
+	for k, p := range l.Players {
+		if p.Nickname == nickname {
+			return k
+		}
+	}
+
 	playerID := util.GenerateRandomShortID()
 	l.Players[playerID] = &Player{
 		Nickname:  nickname,
