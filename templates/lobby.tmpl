@@ -66,12 +66,14 @@
 <div id="end-round" class="modal">
     <div class="modal-content">
         <h5 class="blue-grey-text text-darken-1">结束本回合</h5>
-        <span class="grey-text text-darken-3">选择本回合结果，为获胜玩家加分。</span>
+        {{/*<span class="grey-text text-darken-3">选择本回合结果，为获胜玩家加分。</span>*/}}
+        <span class="grey-text text-darken-3">您确定要结束本回合吗？</span>
     </div>
     <div class="modal-footer">
-        <a onclick="submitResult('men')" class="modal-close waves-effect btn-flat green-text">平民胜</a>
-        <a onclick="submitResult('mafias')" class="modal-close waves-effect btn-flat red-text">狼人胜</a>
-        <a onclick="submitResult('draw')" class="modal-close waves-effect btn-flat">平局</a>
+        {{/*<a onclick="submitResult('men')" class="modal-close waves-effect btn-flat green-text">平民胜</a>*/}}
+        {{/*<a onclick="submitResult('mafias')" class="modal-close waves-effect btn-flat red-text">狼人胜</a>*/}}
+        {{/*<a onclick="submitResult('draw')" class="modal-close waves-effect btn-flat">平局</a>*/}}
+        <a onclick="submitResult('draw')" class="modal-close waves-effect btn-flat">确定</a>
         <a class="modal-close waves-effect btn-flat">取消</a>
     </div>
 </div>
@@ -222,7 +224,8 @@
         playerList.sort((a, b) => (a.score > b.score) ? -1 : (b.score > a.score) ? 1 : 0);
         let innerHTML = [];
         for (let player of playerList) {
-            innerHTML.push(`<span class="left">${player.nickname}</span><span class="right">${player.score}</span>`);
+            // innerHTML.push(`<span class="left">${player.nickname}</span><span class="right">${player.score}</span>`);
+            innerHTML.push(`<span class="left">${player.nickname}</span><span class="right">国际狠人明星</span>`);
         }
         container.innerHTML = innerHTML.join(`<br/>`)
     }
