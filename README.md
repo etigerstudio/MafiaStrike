@@ -12,7 +12,7 @@ MafiaStrike merely maintains player role assigning & secret phrase delivering. A
 
 ## 截图 Screenshots
 
-Pending
+![Screenshots](images/screenshots.png)
 
 ## 服务器 Servers
 
