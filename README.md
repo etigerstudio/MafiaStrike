@@ -1,8 +1,6 @@
 ![Hero](images/hero.png)
 
-5位人类中潜伏了两只共享暗号的狼人，保护好自己，尽快通过蛛丝马迹找出他们！
-
-There are 2 mafias with same secret phrase sneaking among 5 humans. Mind your safety & find them by their flaws!
+5位人类中潜伏了两只共享暗号的狼人，保护好自己，尽快通过蛛丝马迹找出他们！<br/>There are 2 mafias with same secret phrase sneaking among 5 humans. Mind your safety & find them by their flaws!
 
 ## 玩法 Gameplay
 
@@ -16,13 +14,9 @@ MafiaStrike merely maintains player role assigning & secret phrase delivering. A
 
 ## 服务器 Servers
 
-预搭建的服务器：https://mafia-strike.etigerstudio.com
+预搭建的服务器：https://mafia-strike.etigerstudio.com<br/>Public on-the-go server: https://mafia-strike.etigerstudio.com
 
-Public on-the-go server: https://mafia-strike.etigerstudio.com
-
-你也可以很轻松的运行自己的实例：
-
-You could also run your own instance:
+你也可以很轻松的运行自己的实例：<br/>You could also run your own instance:
 
 ```
 $ go run cmd/main.go
